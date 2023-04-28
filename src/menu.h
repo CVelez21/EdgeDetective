@@ -28,10 +28,11 @@ public:
         window.setFramerateLimit(60);
 
         Font font;
-        if(!font.loadFromFile("../src/fonts/arial.ttf"))
-            cout << "Error: font could not be loaded" << endl;
+        if(!font.loadFromFile("../src/fonts/arial.ttf")){
+            cout << "Error: font could not be loaded. Make sure it's in src/fonts/arial.ttf" << endl;
+            return;
+        }
 
-        ///TODO: RESERVE APPROPRIATE VECTOR SIZES
         buttonsList.reserve(4);
         buttonsList.emplace_back(Text("Load File ", font), Vector2f(209,120), Vector2f(240,55), &loadFile);
         buttonsList.emplace_back(Text("Save File ", font), Vector2f(491,120), Vector2f(240,55), &saveFile);
@@ -41,34 +42,32 @@ public:
         buttonsList[2].updateStatus(Button::Status::Disabled); //Disable Prewitt until a file is loaded
         buttonsList[3].updateStatus(Button::Status::Disabled); //Disable Canny until a file is loaded
 
-        //Rectangle that holds the pre-process image.
         dividersList.reserve(2);
+            //Rectangle that holds the pre-process image.
         dividersList.emplace_back(Vector2f(IMAGE_SIZE,IMAGE_SIZE));
         dividersList[0].setPosition(Vector2f(90,175));
         dividersList[0].setFillColor(Color(255,255,255,0));
         dividersList[0].setOutlineThickness(5);
         dividersList[0].setOutlineColor(Color::Black);
-
-        //Rectangle that holds the post-process image.
+            //Rectangle that holds the post-process image.
         dividersList.emplace_back(Vector2f(IMAGE_SIZE,IMAGE_SIZE));
         dividersList[1].setPosition(Vector2f(670,175));
         dividersList[1].setFillColor(Color(255,255,255,0));
         dividersList[1].setOutlineThickness(5);
         dividersList[1].setOutlineColor(Color::Black);
-
-        //Rectangle that holds the text box
+            //Rectangle that holds the text box
         dividersList.emplace_back(Vector2f(520,55));
         dividersList[2].setPosition(Vector2f(90,17));
         dividersList[2].setFillColor(Color(60,60,80,255));
         dividersList[2].setOutlineThickness(3);
         dividersList[2].setOutlineColor(Color(0,0,0,255));
 
-        //Input text
+        textboxList.reserve(2);
+            //Input text
         textboxList.emplace_back(imageName, font);
         textboxList[0].setPosition(Vector2f(90,20));
         textboxList[0].setCharacterSize(40);
-
-        //Error text
+            //Error text
         textboxList.emplace_back("File not found", font);
         textboxList[1].setPosition(Vector2f(120,400));
         textboxList[1].setFillColor(sf::Color::Transparent);
@@ -195,11 +194,11 @@ public:
 
     static void loadFile()
     {
-        cout << "loadFile" << endl;
+        preProcessImage = TGAimg();
         dividersList[0].setFillColor(Color(255,255,255,0));  //Clear the pre-processing box
         dividersList[1].setFillColor(Color(255,255,255,0));  //Clear the post-processing box
         buttonsList[1].updateStatus(Button::Status::Disabled);                 //Disable Save
-        if(preProcessImage.loadIMG("../input/" + imageName)){
+        if(preProcessImage.loadIMG("../input/" + imageName)) {
             buttonsList[2].updateStatus(Button::Status::Default);   //Enable Prewitt
             buttonsList[3].updateStatus(Button::Status::Default);   //Enable Canny
             textboxList[1].setFillColor(sf::Color::Transparent);
@@ -213,7 +212,6 @@ public:
 
     static void saveFile()
     {
-        cout << "saveFile" << endl;
         string fileDir = (buttonsList[2].getStatus() == Button::Status::Default ? "../output/canny_" + imageName: "../output/prewitt_" + imageName);
         processingImage.exportIMG(fileDir);
     }
